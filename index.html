@@ -1,6 +1,143 @@
-<html>
-  <title>마리오</title>
-  <body>
-    <h1>Hello World</h1>
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>마리오 게임</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #container {
+      position: absolute;
+      width: 100%;
+      height: 600px;
+      border: 1px solid black;
+    }
+
+    #mario {
+      position: absolute;
+      width: 100px;
+      bottom: 83px;
+      left: 50px;
+    }
+
+    #enemy {
+      position: absolute;
+      width: 40px;
+      bottom: 83px;
+      right: 50px;
+    }
+
+    #background {
+      position: absolute;
+      width: 200%;
+      height: 100%;
+      background: url("asset/bg.jpeg");
+      background-size: contain;
+      animation-name: bg-slide;
+      animation-duration: 20s;
+      animation-iteration-count: infinite;
+      animation-timing-function: linear;
+    }
+
+    @keyframes bg-slide {
+      from {
+        left: 0px;
+      }
+
+      to {
+        left: -100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container">
+    <div id="background"></div>
+    <img id="mario" src="asset/mario.gif" alt="">
+    <img id="enemy" src="asset/gb.gif" alt="">
+  </div>
+
+  <script>
+    let isJumping = false;
+
+    // 주인공 점프
+    function jump() {
+      isJumping = true;
+      mario.animate({
+        bottom: "+=150px"
+      }).animate({
+        bottom: "-=150px"
+      }, function () {
+        isJumping = false;
+      });
+    }
+
+    function enemyMove() {
+      $("#enemy").animate({
+        right: "120%"
+      }, 5000, function () {
+        $("#enemy").css("right", "-100px");
+      });
+    }
+
+    function deadCheck() {
+      let isDead = false;
+
+      let mario = $("#mario");
+      let enemy = $("#enemy");
+
+      let marioRightX =
+        parseInt(mario.css("left").replace("px", "")) +
+        parseInt(mario.css("width").replace("px", ""));
+
+      let enemyLeftX = parseInt(
+        enemy.css("left").replace("px", "")
+      );
+
+      if (marioRightX > enemyLeftX) {
+        isDead = true;
+      }
+
+      return isDead;
+    }
+
+    let mario = $("#mario");
+
+    // 스페이스바 누르면 점프
+    $("body").keydown(function (event) {
+      switch (event.code) {
+        case "Space":
+          // 스페이스 연타 방지
+          if (isJumping == false) {
+            jump();
+          }
+          break;
+      }
+    });
+
+    // 대략 30frame 화면 갱신
+    setInterval(function () {
+      // 적 이동
+      enemyMove();
+
+      jump();
+
+      // 죽었는지 체크
+      if (deadCheck()) {
+        // alert("마리오가 죽었습니다.")
+        console.log("마리오 사망");
+      }
+    }, 200);
+  </script>
+</body>
+
 </html>
